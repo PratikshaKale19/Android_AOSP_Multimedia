@@ -1,0 +1,35 @@
+Clean Build:
+cd ~/x264
+make clean
+./configure --enable-asm --enable-pic --extra-cflags="-mavx512f -mavx512dq -mavx512bw"
+make > build.log 2>&1
+
+----------------------------------------------------------------------------------------
+
+Run x264:
+./x264 --log-level debug --preset medium --crf 23 --output output_optimized.h264 input.y4m
+------------------------------------------------------------------------------------------
+Profile Performance:
+
+sudo perf record -e cycles ./x264 --log-level debug --preset medium --crf 23 --output output_optimized.h264 input.y4m
+
+sudo perf report -n --stdio > perf_report_optimized.txt
+
+---------------------------------------------------------------------------------------
+
+
+Check Quality:
+Compare the original and optimized videos
+ffmpeg -i output.h264 -i output_optimized.h264 -lavfi psnr -f null -
+
+
+
+
+
+
+mirafra@mirafra:~/x264/profiling/x264$ grep -r "x264_8_pixel_sad_x4_16x16_avx512"
+Binary file common/pixel-8.o matches
+Binary file common/x86/sad-a-8.o matches
+Binary file libx264.a matches
+Binary file x264 matches
+SAD_X_W16_AVX512
